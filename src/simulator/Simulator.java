@@ -5,7 +5,10 @@ import data.Instruction;
 import data.Register;
 import main.MIPSsim;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +63,7 @@ public class Simulator {
             memory();
             writeBack();
             previousContext = new PipelineContext(currentContext);
-            printCycle(System.out, PC);
+            printCycle(writer, PC);
             cycle++;
         }
         try {
@@ -77,7 +80,7 @@ public class Simulator {
         }
     }
 
-    private void printCycle(PrintStream wbuf, int PC) {
+    private void printCycle(BufferedWriter wbuf, int PC) {
         int ind;
 
         String strWaitingIns = new String("");
@@ -169,7 +172,7 @@ public class Simulator {
     }
 
 
-    private void writeRegister(PrintStream writer) {
+    private void writeRegister(BufferedWriter writer) {
         int index = 0;
         try {
             for (; index < 32; index++) {
@@ -180,7 +183,7 @@ public class Simulator {
                         writer.append("\nR" + index + ":");
                     }
                 }
-                writer.print("\t" + prevRegState.registers[index]);
+                writer.append("\t" + prevRegState.registers[index]);
             }
             writer.append("\n\n");
         } catch (Exception e) {
@@ -188,7 +191,7 @@ public class Simulator {
         }
     }
 
-    private void writeData(PrintStream writer) {
+    private void writeData(BufferedWriter writer) {
         int index = 0;
         int address = dataAddress;
         try {
@@ -199,7 +202,7 @@ public class Simulator {
                 writer.append("\t" + dataList.get(index).getValue());
                 address += 4;
             }
-            writer.append("\n\n");
+            writer.append("\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -238,22 +241,36 @@ public class Simulator {
             return true;
         }
 
-        if (order == 1) {
-            // If the next instruction following even a branch inst is a break
-            // then we stop the simulation.. do not fetch the branch..
-            Instruction nextINS = getInstrByAddress(PC + 4);
-            if (nextINS.getName().equals("BREAK")) {
-                isBreak = true;
-                //return false;
-            }
-        }
+//        if (order == 1) {
+//            // If the next instruction following even a branch inst is a break
+//            // then we stop the simulation.. do not fetch the branch..
+//            Instruction nextINS = getInstrByAddress(PC + 4);
+//            if (nextINS.getName().equals("BREAK")) {
+//                isBreak = true;
+//                //return false;
+//            }
+//        }
 
         if (isBranchInstr(inst) && !isBreak) {
             boolean branchHazard = false;
             branch_inst = true;
 
-            if (!"J".equals(inst.getName())) {
+            if ("J".equals(inst.getName())) {
+                PC = inst.getImmediate();
+                waitInstr = null;
+                execInstr = inst;
+            } else {
                 branchHazard = chk_RAW(inst.getFj(), inst.getFk(), previousContext.preIssue.size());
+
+                for (Instruction instr : currentContext.preIssue) {
+                    if (instr.getFi() != null) {
+                        if ((inst.getFj() != null && instr.getFi().intValue() == inst.getFj())
+                                || (inst.getFk() != null && instr.getFi().intValue() == inst.getFk())) {
+                            branchHazard = true;
+                            break;
+                        }
+                    }
+                }
             }
 
             if (branchHazard) {
@@ -335,13 +352,14 @@ public class Simulator {
                 }
             }
         }
-
         if (!hazard) {
             // check with instructions in the pipeline
             for (Instruction instr : inExecList) {
-                if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
-                    hazard = true;
-                    break;
+                if (instr.getFi() != null) {
+                    if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
+                        hazard = true;
+                        break;
+                    }
                 }
             }
         }
@@ -365,9 +383,11 @@ public class Simulator {
         if (!hazard) {
             // check with instructions in the pipeline
             for (Instruction instr : inExecList) {
-                if (reg != null && instr.getFi().intValue() == reg) {
-                    hazard = true;
-                    break;
+                if (instr.getFi() != null) {
+                    if (reg != null && instr.getFi().intValue() == reg) {
+                        hazard = true;
+                        break;
+                    }
                 }
             }
         }
@@ -429,7 +449,23 @@ public class Simulator {
         }
     }
 
-    private boolean checkAndIssue(Instruction inst) {
+    private boolean checkAndIssue(Instruction inst, int order) {
+        // if issue two instructions in one cycle, check if there is WAW of WAR hazards
+        if (order == 2) {
+            Instruction lastInstr = currentContext.preALU.getFirst();
+            Integer reg = inst.getFi();
+            if (reg != null) {
+                // WAR
+                if ((lastInstr.getFj() != null && lastInstr.getFj().intValue() == reg)
+                        || (lastInstr.getFk() != null && lastInstr.getFk().intValue() == reg)) {
+                    return true;
+                }
+                // WAW
+                if (lastInstr.getFi() != null && lastInstr.getFi().intValue() == reg) {
+                    return true;
+                }
+            }
+        }
         int lastIndex = previousContext.preIssue.indexOf(inst);
         boolean rRAW = false;
         boolean rWAW = false;
@@ -484,16 +520,16 @@ public class Simulator {
     }
 
     private void issue() {
-        int issued_count = 0;
+        int order = 1;
 
         //Create a copy of the buffer 
         List<Instruction> preIssueCopy = new ArrayList<>(previousContext.preIssue);
 
         for (Instruction inst : preIssueCopy) {
-            if (checkAndIssue(inst)) {
-                issued_count++;
+            if (checkAndIssue(inst, order)) {
+                order++;
             }
-            if (issued_count == 2) {
+            if (order == 3) {
                 break;
             }
         }
