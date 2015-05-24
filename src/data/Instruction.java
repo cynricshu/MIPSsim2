@@ -10,6 +10,42 @@ public class Instruction {
     private String content;
     private String name;
     private String printValue;
+    private Integer Fi;
+    private Integer Fj;
+    private Integer Fk;
+    private Integer immediate;
+
+    public Integer getFi() {
+        return Fi;
+    }
+
+    public void setFi(Integer fi) {
+        Fi = fi;
+    }
+
+    public Integer getFj() {
+        return Fj;
+    }
+
+    public void setFj(Integer fj) {
+        Fj = fj;
+    }
+
+    public Integer getFk() {
+        return Fk;
+    }
+
+    public void setFk(Integer fk) {
+        Fk = fk;
+    }
+
+    public Integer getImmediate() {
+        return immediate;
+    }
+
+    public void setImmediate(Integer immediate) {
+        this.immediate = immediate;
+    }
 
     public Instruction(String content) {
         this.content = content;

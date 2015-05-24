@@ -1,12 +1,14 @@
 package disassemb;
 
+import data.Data;
+import data.Instruction;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import data.*;
 
 /**
  * User: Cynric
@@ -19,6 +21,34 @@ public class Disassembler {
     private static final String category3Pattern = "111(?<rs>\\d{5})(?<rt>\\d{5})(?<opcode>\\d{3})(?<imValue>\\d{16})";
 
     public Disassembler() {
+    }
+
+    private static void processCategory1(Instruction instruction) {
+        Pattern pattern = Pattern.compile(category1Pattern);
+        Matcher matcher = pattern.matcher(instruction.getContent());
+        if (matcher.matches()) {
+            String opcode = matcher.group("opcode");
+            InstrHandler handler = new Category1InstrHandler(opcode);
+            handler.handle(instruction);
+        }
+    }
+
+    private static void processCategory2(Instruction instruction) {
+        Pattern pattern = Pattern.compile(category2Pattern);
+        Matcher matcher = pattern.matcher(instruction.getContent());
+        if (matcher.matches()) {
+            InstrHandler handler = new Category2InstrHandler(matcher);
+            handler.handle(instruction);
+        }
+    }
+
+    private static void processCategory3(Instruction instruction) {
+        Pattern pattern = Pattern.compile(category3Pattern);
+        Matcher matcher = pattern.matcher(instruction.getContent());
+        if (matcher.matches()) {
+            InstrHandler handler = new Category3InstrHandler(matcher);
+            handler.handle(instruction);
+        }
     }
 
     public void disassemble(Instruction instruction) {
@@ -53,34 +83,6 @@ public class Disassembler {
         }
         data.setValue((symbolFlag << 31) | num);
         return data;
-    }
-
-    private static void processCategory1(Instruction instruction) {
-        Pattern pattern = Pattern.compile(category1Pattern);
-        Matcher matcher = pattern.matcher(instruction.getContent());
-        if (matcher.matches()) {
-            String opcode = matcher.group("opcode");
-            InstrHandler handler = new Category1InstrHandler(opcode);
-            handler.handle(instruction);
-        }
-    }
-
-    private static void processCategory2(Instruction instruction) {
-        Pattern pattern = Pattern.compile(category2Pattern);
-        Matcher matcher = pattern.matcher(instruction.getContent());
-        if (matcher.matches()) {
-            InstrHandler handler = new Category2InstrHandler(matcher);
-            handler.handle(instruction);
-        }
-    }
-
-    private static void processCategory3(Instruction instruction) {
-        Pattern pattern = Pattern.compile(category3Pattern);
-        Matcher matcher = pattern.matcher(instruction.getContent());
-        if (matcher.matches()) {
-            InstrHandler handler = new Category3InstrHandler(matcher);
-            handler.handle(instruction);
-        }
     }
 }
 
@@ -143,6 +145,7 @@ class Category1InstrHandler extends InstrHandler {
         Integer target = (binToDec(instrIndex)) << 2;
         instruction.setPrintValue(instruction.getName() + " #" + target);
         instruction.setArgs(new int[]{target});
+        instruction.setImmediate(target);
     }
 
     public void BEQ() {
@@ -153,6 +156,9 @@ class Category1InstrHandler extends InstrHandler {
         String printValue = instruction.getName() + " R" + binToDec(rs) + ", R" + binToDec(rt) + ", #" + target;
         instruction.setPrintValue(printValue);
         instruction.setArgs(new int[]{binToDec(rs), binToDec(rt), target});
+        instruction.setFj(binToDec(rs));
+        instruction.setFk(binToDec(rt));
+        instruction.setImmediate(target);
     }
 
     public void BGTZ() {
@@ -162,6 +168,8 @@ class Category1InstrHandler extends InstrHandler {
         String printValue = instruction.getName() + " R" + binToDec(rs) + ", #" + target;
         instruction.setPrintValue(printValue);
         instruction.setArgs(new int[]{binToDec(rs), target});
+        instruction.setFj(binToDec(rs));
+        instruction.setImmediate(target);
     }
 
     public void BREAK() {
@@ -175,6 +183,9 @@ class Category1InstrHandler extends InstrHandler {
         String printValue = instruction.getName() + " R" + binToDec(rt) + ", " + binToDec(offset) + "(R" + binToDec(base) + ")";
         instruction.setPrintValue(printValue);
         instruction.setArgs(new int[]{binToDec(base), binToDec(rt), binToDec(offset)});
+        instruction.setFi(binToDec(rt));
+        instruction.setFj(binToDec(base));
+        instruction.setImmediate(binToDec(offset));
     }
 
     public void LW() {
@@ -184,6 +195,9 @@ class Category1InstrHandler extends InstrHandler {
         String printValue = instruction.getName() + " R" + binToDec(rt) + ", " + binToDec(offset) + "(R" + binToDec(base) + ")";
         instruction.setPrintValue(printValue);
         instruction.setArgs(new int[]{binToDec(base), binToDec(rt), binToDec(offset)});
+        instruction.setFi(binToDec(rt));
+        instruction.setFj(binToDec(base));
+        instruction.setImmediate(binToDec(offset));
     }
 }
 
@@ -215,6 +229,9 @@ class Category2InstrHandler extends InstrHandler {
         instruction.setPrintValue(printValue);
         instruction.setName(name);
         instruction.setArgs(new int[]{binToDec(rd), binToDec(rs), binToDec(rt)});
+        instruction.setFi(binToDec(rd));
+        instruction.setFj(binToDec(rs));
+        instruction.setFk(binToDec(rt));
     }
 }
 
@@ -243,5 +260,8 @@ class Category3InstrHandler extends InstrHandler {
         instruction.setPrintValue(printValue);
         instruction.setName(name);
         instruction.setArgs(new int[]{binToDec(rt), binToDec(rs), binToDec(imValue)});
+        instruction.setFi(binToDec(rt));
+        instruction.setFj(binToDec(rs));
+        instruction.setImmediate(binToDec(imValue));
     }
 }

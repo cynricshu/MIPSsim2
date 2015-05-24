@@ -42,7 +42,7 @@ public class MIPSsim {
             reader.close();
 
             simulator.printInstr(_disassembleFilePath);
-//            simulator.exec();
+            simulator.exec();
 
         } catch (IOException e) {
             e.printStackTrace();
