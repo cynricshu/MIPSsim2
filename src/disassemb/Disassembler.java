@@ -183,8 +183,8 @@ class Category1InstrHandler extends InstrHandler {
         String printValue = instruction.getName() + " R" + binToDec(rt) + ", " + binToDec(offset) + "(R" + binToDec(base) + ")";
         instruction.setPrintValue(printValue);
         instruction.setArgs(new int[]{binToDec(base), binToDec(rt), binToDec(offset)});
-        instruction.setFi(binToDec(rt));
-        instruction.setFj(binToDec(base));
+        instruction.setFj(binToDec(rt));
+        instruction.setFk(binToDec(base));
         instruction.setImmediate(binToDec(offset));
     }
 

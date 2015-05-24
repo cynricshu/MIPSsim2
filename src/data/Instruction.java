@@ -14,6 +14,24 @@ public class Instruction {
     private Integer Fj;
     private Integer Fk;
     private Integer immediate;
+    private Integer address;
+    private Integer readedData;
+
+    public Integer getReadedData() {
+        return readedData;
+    }
+
+    public void setReadedData(Integer readedData) {
+        this.readedData = readedData;
+    }
+
+    public Integer getAddress() {
+        return address;
+    }
+
+    public void setAddress(Integer address) {
+        this.address = address;
+    }
 
     public Integer getFi() {
         return Fi;
