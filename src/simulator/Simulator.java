@@ -39,11 +39,11 @@ public class Simulator {
     boolean isBreak = false;
     BufferedWriter writer;
 
-    public void exec() {
+    public void exec(String outputPath) {
         dataAddress = startAddress + instrList.size() * 4;
         cycle = 1;
         try {
-            writer = new BufferedWriter(new FileWriter(MIPSsim._simulationFilePath));
+            writer = new BufferedWriter(new FileWriter(outputPath));
         } catch (IOException e) {
             e.printStackTrace();
         }
