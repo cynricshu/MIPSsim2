@@ -3,7 +3,6 @@ package simulator;
 import data.Data;
 import data.Instruction;
 import data.Register;
-import main.MIPSsim;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -215,11 +214,11 @@ public class Simulator {
             return true;
         }
 
-        if (isBranchInstr(instr) && !isBreak) { // for branch instr, execute in IF period
+        if (isBranchInstr(instr)) { // for branch instr, execute in IF period
             boolean branchHazard = false;
             branch_inst = true;
 
-            if ("J".equals(instr.getName())) {
+            if ("J".equals(instr.getName())) { // handle jump immediately
                 stalled = false;
                 PC = instr.getImmediate();
                 waitInstr = null;
@@ -261,15 +260,13 @@ public class Simulator {
                 waitInstr = null;
                 execInstr = instr;
             }
+        } else {
+            if (!stalled) {
+                currentContext.preIssue.addLast(instr);
+                PC += 4;
+            }
         }
 
-        if (!branch_inst && !stalled) {
-            currentContext.preIssue.addLast(instr);
-            PC += 4;
-        } else if (isBranchInstr(instr) && isBreak) {
-            execInstr = instr;
-            PC += 4;
-        }
         return branch_inst;
     }
 
@@ -287,7 +284,8 @@ public class Simulator {
         for (int i = 0; i < lastIndex; i++) {
             Instruction instr = previousContext.preIssue.get(i);
             if (instr.getFi() != null) {
-                if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
+                if ((reg1 != null && instr.getFi().intValue() == reg1)
+                        || (reg2 != null && instr.getFi().intValue() == reg2)) {
                     hazard = true;
                     break;
                 }
@@ -295,7 +293,8 @@ public class Simulator {
         }
         for (Instruction instr : inExecList) {
             if (instr.getFi() != null) {
-                if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
+                if ((reg1 != null && instr.getFi().intValue() == reg1)
+                        || (reg2 != null && instr.getFi().intValue() == reg2)) {
                     hazard = true;
                     break;
                 }
@@ -334,7 +333,8 @@ public class Simulator {
         //check with earlier not issued instructions 
         for (int i = 0; i < lastIndex; i++) {
             Instruction instr = previousContext.preIssue.get(i);
-            if ((instr.getFj() != null && instr.getFj().intValue() == reg) || (instr.getFk() != null && instr.getFk().intValue() == reg)) {
+            if ((instr.getFj() != null && instr.getFj().intValue() == reg)
+                    || (instr.getFk() != null && instr.getFk().intValue() == reg)) {
                 hazard = true;
                 break;
             }
@@ -361,7 +361,12 @@ public class Simulator {
 
         if (previousContext.postALU.size() >= 1) {
             instr = currentContext.postALU.remove();
-            updateRegister(instr);
+            if (instr.getFi() != null) {
+                prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()];
+            }
+            if (instr.getFj() != null) {
+                prevRegState.registers[instr.getFj()] = currentRegState.registers[instr.getFj()];
+            }
             inExecList.remove(instr);
         }
 
@@ -369,15 +374,6 @@ public class Simulator {
             instr = currentContext.postMEM.remove();
             prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()] = getMemoryData(instr.getAddress());
             inExecList.remove(instr);
-        }
-    }
-
-    void updateRegister(Instruction instr) {
-        if (instr.getFi() != null) {
-            prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()];
-        }
-        if (instr.getFj() != null) {
-            prevRegState.registers[instr.getFj()] = currentRegState.registers[instr.getFj()];
         }
     }
 
@@ -399,10 +395,10 @@ public class Simulator {
             }
         }
         int lastIndex = previousContext.preIssue.indexOf(instr);
-        boolean hasRAW = false;
-        boolean hasWAW = false;
-        boolean hasWAR = false;
-        boolean hasSW = false;
+        boolean hasRAW;
+        boolean hasWAW;
+        boolean hasWAR;
+        boolean hasSW;
         boolean issued = false;
 
         String name = instr.getName();
