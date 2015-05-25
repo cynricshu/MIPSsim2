@@ -22,10 +22,6 @@ import java.util.List;
 
 public class Simulator {
     public static final int PRE_ISSUE_SIZE = 4;
-    public static final int PRE_ALU_SIZE = 2;
-    public static final int PRE_MEM_SIZE = 1;
-    public static final int POST_MEM_SIZE = 1;
-    public static final int POST_ALU_SIZE = 1;
     public Instruction execInstr;
     public Instruction waitInstr;
     public LinkedList<Instruction> inExecList = new LinkedList<>();
@@ -63,7 +59,7 @@ public class Simulator {
             memory();
             writeBack();
             previousContext = new PipelineContext(currentContext);
-            printCycle(writer, PC);
+            printCycle(writer);
             cycle++;
         }
         try {
@@ -80,7 +76,7 @@ public class Simulator {
         }
     }
 
-    private void printCycle(BufferedWriter wbuf, int PC) {
+    private void printCycle(BufferedWriter writer) {
         int ind;
 
         String strWaitingIns = new String("");
@@ -131,40 +127,33 @@ public class Simulator {
         }
 
         try {
-            wbuf.append("--------------------\n");
-            //wbuf.write( String.format("Cycle:%d PC:%d", cycle, PC) );
-            wbuf.append(String.format("Cycle:%d", cycle));
-            wbuf.append("\n\n");
-            wbuf.append("IF Unit:\n");
-            wbuf.append(String.format("\tWaiting Instruction:%s\n", strWaitingIns));
-            wbuf.append(String.format("\tExecuted Instruction:%s\n", strExecutedIns));
+            writer.append("--------------------\n");
+            writer.append(String.format("Cycle:%d", cycle));
+            writer.append("\n\n");
+            writer.append("IF Unit:\n");
+            writer.append(String.format("\tWaiting Instruction:%s\n", strWaitingIns));
+            writer.append(String.format("\tExecuted Instruction:%s\n", strExecutedIns));
 
-            wbuf.append("Pre-Issue Queue:\n");
-            wbuf.append(String.format("\tEntry 0:%s\n", strPreIssueBuf[0]));
-            wbuf.append(String.format("\tEntry 1:%s\n", strPreIssueBuf[1]));
-            wbuf.append(String.format("\tEntry 2:%s\n", strPreIssueBuf[2]));
-            wbuf.append(String.format("\tEntry 3:%s\n", strPreIssueBuf[3]));
+            writer.append("Pre-Issue Queue:\n");
+            writer.append(String.format("\tEntry 0:%s\n", strPreIssueBuf[0]));
+            writer.append(String.format("\tEntry 1:%s\n", strPreIssueBuf[1]));
+            writer.append(String.format("\tEntry 2:%s\n", strPreIssueBuf[2]));
+            writer.append(String.format("\tEntry 3:%s\n", strPreIssueBuf[3]));
 
-            wbuf.append("Pre-ALU Queue:\n");
-            wbuf.append(String.format("\tEntry 0:%s\n", strPreALUBuf[0]));
-            wbuf.append(String.format("\tEntry 1:%s\n", strPreALUBuf[1]));
-//        wbuf.write(String.format("Post-ALU Buffer:%s\n", strPostALUBuf));
+            writer.append("Pre-ALU Queue:\n");
+            writer.append(String.format("\tEntry 0:%s\n", strPreALUBuf[0]));
+            writer.append(String.format("\tEntry 1:%s\n", strPreALUBuf[1]));
 
-//        wbuf.write("Pre-ALUB Queue:\n");
-//        wbuf.write(String.format("\tEntry 0:%s\n", strPreALUBBuf[0]));
-//        wbuf.write(String.format("\tEntry 1:%s\n", strPreALUBBuf[1]));
-//        wbuf.write(String.format("Post-ALUB Buffer:%s\n", strPostALUBBuf));
+            writer.append(String.format("Pre-MEM Queue:%s\n", strPreMEM));
+            writer.append(String.format("Post-MEM Queue:%s\n", strPostMEM));
+            writer.append(String.format("Post-ALU Queue:%s\n", strPostALUBuf));
 
-            wbuf.append(String.format("Pre-MEM Queue:%s\n", strPreMEM));
-            wbuf.append(String.format("Post-MEM Queue:%s\n", strPostMEM));
-            wbuf.append(String.format("Post-ALU Queue:%s\n", strPostALUBuf));
-
-            wbuf.append("\n");
-            wbuf.append("Registers");
-            writeRegister(wbuf);
-            wbuf.append("Data");
-            writeData(wbuf);
-            wbuf.flush();
+            writer.append("\n");
+            writer.append("Registers");
+            writeRegister(writer);
+            writer.append("Data");
+            writeData(writer);
+            writer.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -210,22 +199,20 @@ public class Simulator {
 
     public void instrFetch() {
         int emptySlotSize = PRE_ISSUE_SIZE - previousContext.preIssue.size();
-        boolean branch_inst;
+        boolean isBranchInstr;
 
-        //if(sim_exit) return;
         waitInstr = null;
         execInstr = null;
-        branch_inst = false;
+        isBranchInstr = false;
 
         //Fetch the 1st instruction
         if (emptySlotSize >= 1) {
-            //branch_inst = procFetch(empty_slots >= 2);
-            branch_inst = procFetch(1);
+            isBranchInstr = procFetch(1);
         }
 
         //Fetch the 2nd instruction
-        if (emptySlotSize >= 2 && !branch_inst) {
-            branch_inst = procFetch(2);
+        if (emptySlotSize >= 2 && !isBranchInstr) {
+            procFetch(2);
         }
 
     }
@@ -233,39 +220,30 @@ public class Simulator {
     private boolean procFetch(int order) {
         boolean branch_inst = false;
 
-        Instruction inst = getInstrByAddress(PC);
+        Instruction instr = getInstrByAddress(PC);
 
-        if (inst.getName().equals("BREAK")) {
+        if (instr.getName().equals("BREAK")) {
             isBreak = true;
-            execInstr = inst;
+            execInstr = instr;
             return true;
         }
 
-//        if (order == 1) {
-//            // If the next instruction following even a branch inst is a break
-//            // then we stop the simulation.. do not fetch the branch..
-//            Instruction nextINS = getInstrByAddress(PC + 4);
-//            if (nextINS.getName().equals("BREAK")) {
-//                isBreak = true;
-//                //return false;
-//            }
-//        }
-
-        if (isBranchInstr(inst) && !isBreak) {
+        if (isBranchInstr(instr) && !isBreak) { // for branch instr, execute in IF period
             boolean branchHazard = false;
             branch_inst = true;
 
-            if ("J".equals(inst.getName())) {
-                PC = inst.getImmediate();
+            if ("J".equals(instr.getName())) {
+                PC = instr.getImmediate();
                 waitInstr = null;
-                execInstr = inst;
+                execInstr = instr;
             } else {
-                branchHazard = chk_RAW(inst.getFj(), inst.getFk(), previousContext.preIssue.size());
+                branchHazard = checkRAW(instr.getFj(), instr.getFk(), previousContext.preIssue.size());
 
-                for (Instruction instr : currentContext.preIssue) {
-                    if (instr.getFi() != null) {
-                        if ((inst.getFj() != null && instr.getFi().intValue() == inst.getFj())
-                                || (inst.getFk() != null && instr.getFi().intValue() == inst.getFk())) {
+                // check RAW
+                for (Instruction previousInstr : currentContext.preIssue) {
+                    if (previousInstr.getFi() != null) {
+                        if ((instr.getFj() != null && previousInstr.getFi().intValue() == instr.getFj())
+                                || (instr.getFk() != null && previousInstr.getFi().intValue() == instr.getFk())) {
                             branchHazard = true;
                             break;
                         }
@@ -275,71 +253,48 @@ public class Simulator {
 
             if (branchHazard) {
                 stalled = true;
-                waitInstr = inst;
+                waitInstr = instr;
                 execInstr = null;
             } else {
                 stalled = false;
-                switch (inst.getName()) {
-                    // catetory1
-                    case "J":
-                        PC = inst.getImmediate();  // TODO check if need to -4
-                        break;
+                switch (instr.getName()) {
                     case "BEQ":
-                        if (prevRegState.registers[inst.getFj()] == prevRegState.registers[inst.getFk()]) {
-                            PC = PC + inst.getImmediate();
+                        if (prevRegState.registers[instr.getFj()] == prevRegState.registers[instr.getFk()]) {
+                            PC = PC + instr.getImmediate();
                         }
                         PC += 4;
                         break;
                     case "BGTZ":
-                        if (prevRegState.registers[inst.getFj()] > 0) {
-                            PC = PC + inst.getImmediate();
+                        if (prevRegState.registers[instr.getFj()] > 0) {
+                            PC = PC + instr.getImmediate();
                         }
                         PC += 4;
                         break;
                 }
                 waitInstr = null;
-                execInstr = inst;
+                execInstr = instr;
             }
         }
 
-        //check if the current instruction is branch, which would not have been executed and
-        //the next instruction is BREAK
         if (!branch_inst && !stalled) {
-            currentContext.preIssue.addLast(inst);
+            currentContext.preIssue.addLast(instr);
             PC += 4;
-        } else if (isBranchInstr(inst) && isBreak) {
-            execInstr = inst;
+        } else if (isBranchInstr(instr) && isBreak) {
+            execInstr = instr;
             PC += 4;
         }
-
-        //check if the current instruction is branch, which would not have been executed and
-        //the next instruction is BREAK
-//	if( (INS.instType == OPCode.BRANCH && sim_exit) || (INS.opcode == OPCode.NOP)) {
-//		executedIns = INS;
-//		PC += 4;
-//	}
-//	else if(!(INS.opcode == OPCode.BREAK) && !branch_inst && !(INS.opcode == OPCode.NOP) && !stalled) {
-//		currentState.preIssue.buffer.addLast(INS);
-//		PC += 4;
-//	}
         return branch_inst;
     }
 
     private boolean isBranchInstr(Instruction instruction) {
         String instrName = instruction.getName();
-        if ("BGTZ".equals(instrName)) {
-            return true;
-        }
-        if ("J".equals(instrName)) {
-            return true;
-        }
-        if ("BEQ".equals(instrName)) {
+        if ("BGTZ".equals(instrName) || "J".equals(instrName) || "BEQ".equals(instrName)) {
             return true;
         }
         return false;
     }
 
-    private boolean chk_RAW(Integer reg1, Integer reg2, int lastIndex) {
+    private boolean checkRAW(Integer reg1, Integer reg2, int lastIndex) {
         boolean hazard = false;
 
         //check with earlier not issued instructions 
@@ -366,7 +321,7 @@ public class Simulator {
         return hazard;
     }
 
-    private boolean chk_WAW(Integer reg, int lastIndex) {
+    private boolean checkWAW(Integer reg, int lastIndex) {
         boolean hazard = false;
 
         //check with earlier not issued instructions 
@@ -394,7 +349,7 @@ public class Simulator {
         return hazard;
     }
 
-    private boolean chk_WAR(Integer reg, int lastIndex) {
+    private boolean checkWAR(Integer reg, int lastIndex) {
         boolean hazard = false;
 
         //check with earlier not issued instructions 
@@ -409,7 +364,7 @@ public class Simulator {
         return hazard;
     }
 
-    boolean chk_SWinst(Integer lastIndex) {
+    boolean checkSW(Integer lastIndex) {
         boolean sw_exists = false;
 
         for (int i = 0; i < lastIndex; i++) {
@@ -423,37 +378,35 @@ public class Simulator {
     }
 
     private void writeBack() {
-        Instruction inst;
+        Instruction instr;
 
-        // chk postALU Buffer
         if (previousContext.postALU.size() >= 1) {
-            inst = currentContext.postALU.remove();
-            updateRegister(inst);
-            inExecList.remove(inst);
+            instr = currentContext.postALU.remove();
+            updateRegister(instr);
+            inExecList.remove(instr);
         }
 
-        //chk postMEM Buffer
         if (previousContext.postMEM.size() >= 1) {
-            inst = currentContext.postMEM.remove();
-            prevRegState.registers[inst.getFi()] = currentRegState.registers[inst.getFi()] = getMemoryData(inst.getAddress());
-            inExecList.remove(inst);
+            instr = currentContext.postMEM.remove();
+            prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()] = getMemoryData(instr.getAddress());
+            inExecList.remove(instr);
         }
     }
 
-    void updateRegister(Instruction inst) {
-        if (inst.getFi() != null) {
-            prevRegState.registers[inst.getFi()] = currentRegState.registers[inst.getFi()];
+    void updateRegister(Instruction instr) {
+        if (instr.getFi() != null) {
+            prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()];
         }
-        if (inst.getFj() != null) {
-            prevRegState.registers[inst.getFj()] = currentRegState.registers[inst.getFj()];
+        if (instr.getFj() != null) {
+            prevRegState.registers[instr.getFj()] = currentRegState.registers[instr.getFj()];
         }
     }
 
-    private boolean checkAndIssue(Instruction inst, int order) {
+    private boolean checkAndIssue(Instruction instr, int order) {
         // if issue two instructions in one cycle, check if there is WAW of WAR hazards
         if (order == 2) {
             Instruction lastInstr = currentContext.preALU.getFirst();
-            Integer reg = inst.getFi();
+            Integer reg = instr.getFi();
             if (reg != null) {
                 // WAR
                 if ((lastInstr.getFj() != null && lastInstr.getFj().intValue() == reg)
@@ -466,54 +419,53 @@ public class Simulator {
                 }
             }
         }
-        int lastIndex = previousContext.preIssue.indexOf(inst);
-        boolean rRAW = false;
-        boolean rWAW = false;
-        boolean rWAR = false;
-        boolean rMEM = false;
+        int lastIndex = previousContext.preIssue.indexOf(instr);
+        boolean hasRAW = false;
+        boolean hasWAW = false;
+        boolean hasWAR = false;
+        boolean hasSW = false;
         boolean issued = false;
 
-        String name = inst.getName();
+        String name = instr.getName();
         if ("SW".equals(name)) {
             //For SW t is R and getFj() is R
-            rRAW = chk_RAW(inst.getFj(), inst.getFk(), lastIndex);
+            hasRAW = checkRAW(instr.getFj(), instr.getFk(), lastIndex);
 
-            if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !rRAW) {
-                previousContext.preIssue.remove(inst);
-                currentContext.preIssue.remove(inst);
-                currentContext.preALU.addLast(inst);
+            if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW) {
+                previousContext.preIssue.remove(instr);
+                currentContext.preIssue.remove(instr);
+                currentContext.preALU.addLast(instr);
                 issued = true;
             }
         } else if ("LW".equals(name)) {
             //For LW t is W and getFj() is R
-            rMEM = chk_SWinst(lastIndex);
-            rRAW = chk_RAW(inst.getFj(), inst.getFk(), lastIndex);
-            rWAW = chk_WAW(inst.getFi(), lastIndex);
-            rWAR = chk_WAR(inst.getFi(), lastIndex);
+            hasSW = checkSW(lastIndex);
+            hasRAW = checkRAW(instr.getFj(), instr.getFk(), lastIndex);
+            hasWAW = checkWAW(instr.getFi(), lastIndex);
+            hasWAR = checkWAR(instr.getFi(), lastIndex);
 
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2
-                    && !rRAW && !rWAW && !rWAR && !rMEM) {
-                previousContext.preIssue.remove(inst);
-                currentContext.preIssue.remove(inst);
-                currentContext.preALU.addLast(inst);
+                    && !hasRAW && !hasWAW && !hasWAR && !hasSW) {
+                previousContext.preIssue.remove(instr);
+                currentContext.preIssue.remove(instr);
+                currentContext.preALU.addLast(instr);
                 issued = true;
             }
-        } else if (!isBranchInstr(inst)) {
-            rRAW = chk_RAW(inst.getFj(), inst.getFk(), lastIndex);
-            rWAW = chk_WAW(inst.getFi(), lastIndex);
-            rWAR = chk_WAR(inst.getFi(), lastIndex);
+        } else if (!isBranchInstr(instr)) {
+            hasRAW = checkRAW(instr.getFj(), instr.getFk(), lastIndex);
+            hasWAW = checkWAW(instr.getFi(), lastIndex);
+            hasWAR = checkWAR(instr.getFi(), lastIndex);
 
-            if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !rRAW && !rWAW && !rWAR) {
-                previousContext.preIssue.remove(inst);
-                currentContext.preIssue.remove(inst);
-                currentContext.preALU.addLast(inst);
+            if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW && !hasWAW && !hasWAR) {
+                previousContext.preIssue.remove(instr);
+                currentContext.preIssue.remove(instr);
+                currentContext.preALU.addLast(instr);
                 issued = true;
             }
         }
 
-        //If the instruction is issued then push it into the execution buffer as well to keep track of it
         if (issued) {
-            inExecList.addLast(inst);
+            inExecList.addLast(instr);
         }
         return issued;
 
@@ -525,8 +477,8 @@ public class Simulator {
         //Create a copy of the buffer 
         List<Instruction> preIssueCopy = new ArrayList<>(previousContext.preIssue);
 
-        for (Instruction inst : preIssueCopy) {
-            if (checkAndIssue(inst, order)) {
+        for (Instruction instr : preIssueCopy) {
+            if (checkAndIssue(instr, order)) {
                 order++;
             }
             if (order == 3) {
@@ -536,50 +488,49 @@ public class Simulator {
     }
 
     private void execute() {
-        Instruction inst;
+        Instruction instr;
 
-        //Execute ALU Instructions if any.. 
         if (previousContext.preALU.size() >= 1) {
-            inst = currentContext.preALU.remove();
-            String name = inst.getName();
-            if ("LW".equals(name) || "SW".equals(name)) {
+            instr = currentContext.preALU.remove();
+            String name = instr.getName();
+            if ("LW".equals(name) || "SW".equals(name)) { // calculate address only
                 int address;
                 switch (name) {
                     case "LW":
-                        address = prevRegState.registers[inst.getFj()] + inst.getImmediate();
-                        inst.setAddress(address);
-                        currentContext.preMEM.addLast(inst);
+                        address = prevRegState.registers[instr.getFj()] + instr.getImmediate();
+                        instr.setAddress(address);
+                        currentContext.preMEM.addLast(instr);
                         break;
                     case "SW":
-                        address = prevRegState.registers[inst.getFk()] + inst.getImmediate();
-                        inst.setAddress(address);
-                        currentContext.preMEM.addLast(inst);
+                        address = prevRegState.registers[instr.getFk()] + instr.getImmediate();
+                        instr.setAddress(address);
+                        currentContext.preMEM.addLast(instr);
                         break;
                     default:
                         break;
                 }
             } else {
-                executeInstruction(inst);
-                currentContext.postALU.addLast(inst);
+                executeInstruction(instr);
+                currentContext.postALU.addLast(instr);
             }
         }
 
     }
 
     private void memory() {
-        Instruction inst;
+        Instruction instr;
         if (previousContext.preMEM.size() > 0) {
-            inst = currentContext.preMEM.remove();
-            String name = inst.getName();
-            int address = inst.getAddress();
+            instr = currentContext.preMEM.remove();
+            String name = instr.getName();
+            int address = instr.getAddress();
             switch (name) {
                 case "LW":
                     int readedData = getMemoryData(address);
-                    inst.setReadedData(readedData);
-                    currentContext.postMEM.addLast(inst);
+                    instr.setReadedData(readedData);
+                    currentContext.postMEM.addLast(instr);
                     break;
                 case "SW":
-                    saveToMemory(prevRegState.registers[inst.getFj()], address);
+                    saveToMemory(prevRegState.registers[instr.getFj()], address);
                     break;
                 default:
                     break;
@@ -587,42 +538,42 @@ public class Simulator {
         }
     }
 
-    private void executeInstruction(Instruction inst) {
-        switch (inst.getName()) {
+    private void executeInstruction(Instruction instr) {
+        switch (instr.getName()) {
             // category 2
             case "ADD":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] + prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] + prevRegState.registers[instr.getFk()];
                 break;
             case "SUB":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] - prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] - prevRegState.registers[instr.getFk()];
                 break;
             case "MUL":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] * prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] * prevRegState.registers[instr.getFk()];
                 break;
             case "AND":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] & prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] & prevRegState.registers[instr.getFk()];
                 break;
             case "OR":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] | prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] | prevRegState.registers[instr.getFk()];
                 break;
             case "XOR":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] ^ prevRegState.registers[inst.getFk()];
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] ^ prevRegState.registers[instr.getFk()];
                 break;
             case "NOR":
-                currentRegState.registers[inst.getFi()] = ~(prevRegState.registers[inst.getFj()] | prevRegState.registers[inst.getFk()]);
+                currentRegState.registers[instr.getFi()] = ~(prevRegState.registers[instr.getFj()] | prevRegState.registers[instr.getFk()]);
                 break;
             // caetgory 3
             case "ADDI":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] + inst.getImmediate();
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] + instr.getImmediate();
                 break;
             case "ANDI":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] & inst.getImmediate();
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] & instr.getImmediate();
                 break;
             case "ORI":
-                currentRegState.registers[inst.getFi()] = ~(prevRegState.registers[inst.getFj()] | inst.getImmediate());
+                currentRegState.registers[instr.getFi()] = ~(prevRegState.registers[instr.getFj()] | instr.getImmediate());
                 break;
             case "XORI":
-                currentRegState.registers[inst.getFi()] = prevRegState.registers[inst.getFj()] ^ inst.getImmediate();
+                currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] ^ instr.getImmediate();
                 break;
             default:
                 break;
