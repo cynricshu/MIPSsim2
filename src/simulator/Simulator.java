@@ -73,7 +73,7 @@ public class Simulator {
     }
 
     private void printCycle(BufferedWriter writer) {
-        int ind;
+        int index;
 
         String strWaitingIns = "";
         if (waitInstr != null) {
@@ -85,18 +85,18 @@ public class Simulator {
             strExecutedIns = "[" + execInstr.getPrintValue() + "]";
         }
 
-        String strPreIssueBuf[] = new String[4];
-        ind = 0;
+        String strPreIssueBuf[] = new String[]{"", "", "", ""};
+        index = 0;
         for (Instruction ins : previousContext.preIssue) {
-            strPreIssueBuf[ind] = "[" + ins.getPrintValue() + "]";
-            ind++;
+            strPreIssueBuf[index] = "[" + ins.getPrintValue() + "]";
+            index++;
         }
 
-        String strPreALUBuf[] = new String[2];
-        ind = 0;
+        String strPreALUBuf[] = new String[]{"", ""};
+        index = 0;
         for (Instruction ins : previousContext.preALU) {
-            strPreALUBuf[ind] = "[" + ins.getPrintValue() + "]";
-            ind++;
+            strPreALUBuf[index] = "[" + ins.getPrintValue() + "]";
+            index++;
         }
 
         String strPostALUBuf = "";
@@ -287,7 +287,6 @@ public class Simulator {
     private boolean checkRAW(Integer reg1, Integer reg2, int lastIndex) {
         boolean hazard = false;
 
-        //check with earlier not issued instructions 
         for (int i = 0; i < lastIndex; i++) {
             Instruction instr = previousContext.preIssue.get(i);
             if (instr.getFi() != null) {
@@ -297,14 +296,11 @@ public class Simulator {
                 }
             }
         }
-        if (!hazard) {
-            // check with instructions in the pipeline
-            for (Instruction instr : inExecList) {
-                if (instr.getFi() != null) {
-                    if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
-                        hazard = true;
-                        break;
-                    }
+        for (Instruction instr : inExecList) {
+            if (instr.getFi() != null) {
+                if ((reg1 != null && instr.getFi().intValue() == reg1) || (reg2 != null && instr.getFi().intValue() == reg2)) {
+                    hazard = true;
+                    break;
                 }
             }
         }
@@ -314,7 +310,6 @@ public class Simulator {
     private boolean checkWAW(Integer reg, int lastIndex) {
         boolean hazard = false;
 
-        //check with earlier not issued instructions 
         for (int i = 0; i < lastIndex; i++) {
             Instruction instr = previousContext.preIssue.get(i);
             if (instr.getFi() != null) {
@@ -325,14 +320,11 @@ public class Simulator {
             }
         }
 
-        if (!hazard) {
-            // check with instructions in the pipeline
-            for (Instruction instr : inExecList) {
-                if (instr.getFi() != null) {
-                    if (reg != null && instr.getFi().intValue() == reg) {
-                        hazard = true;
-                        break;
-                    }
+        for (Instruction instr : inExecList) {
+            if (instr.getFi() != null) {
+                if (reg != null && instr.getFi().intValue() == reg) {
+                    hazard = true;
+                    break;
                 }
             }
         }

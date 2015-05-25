@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/simulator/Simulator.java" line="486" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d40d78-29cb-4ad8-a93d-5f1095ccefe5" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simulator/Simulator.java" afterPath="$PROJECT_DIR$/src/simulator/Simulator.java" />
@@ -32,26 +29,13 @@
       <file leaf-file-name="Simulator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/simulator/Simulator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.06967213">
-              <caret line="235" column="32" selection-start-line="235" selection-start-column="32" selection-end-line="235" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.7756184">
+              <caret line="306" column="9" selection-start-line="306" selection-start-column="9" selection-end-line="306" selection-end-column="9" />
               <folding>
                 <element signature="method#saveToMemory#0;class#Simulator#0" expanded="false" />
                 <element signature="method#getMemoryData#0;class#Simulator#0" expanded="false" />
                 <element signature="method#printInstr#0;class#Simulator#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="simulation.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resource/simulation.txt">
-          <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-636.0345">
-              <caret line="1085" column="32" selection-start-line="1085" selection-start-column="32" selection-end-line="1085" selection-end-column="32" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -95,8 +79,8 @@
         <option value="$PROJECT_DIR$/src/simulator/PipelineContext.java" />
         <option value="$PROJECT_DIR$/src/main/MIPSsim.java" />
         <option value="$PROJECT_DIR$/src/disassemb/Disassembler.java" />
-        <option value="$PROJECT_DIR$/src/data/Instruction.java" />
         <option value="$PROJECT_DIR$/resource/simulation.txt" />
+        <option value="$PROJECT_DIR$/src/data/Instruction.java" />
         <option value="$PROJECT_DIR$/src/simulator/Simulator.java" />
       </list>
     </option>
@@ -442,7 +426,7 @@
       <option name="number" value="Default" />
       <updated>1432429501123</updated>
       <workItem from="1432429502624" duration="29339000" />
-      <workItem from="1432537858614" duration="1956000" />
+      <workItem from="1432537858614" duration="3752000" />
     </task>
     <task id="LOCAL-00001" summary="反编译">
       <created>1432447069377</created>
@@ -480,15 +464,27 @@
       <option name="project" value="LOCAL" />
       <updated>1432539045300</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="optimize">
+      <created>1432539826424</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1432539826424</updated>
+    </task>
+    <task id="LOCAL-00008" summary="optimize">
+      <created>1432541289778</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1432541289778</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31295000" />
+    <option name="totallyTimeSpent" value="33091000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="1123" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -496,11 +492,11 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32821077" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19382322" sideWeight="0.59085715" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.6004391" sideWeight="0.6965567" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.600388" sideWeight="0.6965567" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4248079" sideWeight="0.5021299" order="13" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26895565" sideWeight="0.32331732" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42386034" sideWeight="0.4978701" order="14" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34467617" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42386034" sideWeight="0.4978701" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3443259" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32890365" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -574,6 +570,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <MESSAGE value="反编译" />
     <MESSAGE value="init commit&#10;" />
     <MESSAGE value="有了一个可以运行的版本，但结果有错。" />
@@ -584,45 +581,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>282</line>
-          <properties />
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>259</line>
-          <properties />
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>221</line>
-          <properties />
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>237</line>
-          <properties />
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>460</line>
-          <properties />
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/simulator/Simulator.java</url>
-          <line>477</line>
-          <properties />
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="22" />
+      <option name="time" value="26" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -678,7 +637,8 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
           <folding>
-            <element signature="e#439#440#0" expanded="true" />
+            <element signature="e#1235#1236#0" expanded="true" />
+            <element signature="e#1273#1274#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -731,6 +691,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.26953566">
           <caret line="14" column="41" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -772,21 +735,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/data/Instruction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3220339">
-          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
-          <folding>
-            <element signature="e#439#440#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/data/Data.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.118644066">
           <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/data/Register.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.22033899">
+          <caret line="13" column="38" selection-start-line="13" selection-start-column="38" selection-end-line="13" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/data/Instruction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.47530866">
+          <caret line="71" column="0" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
+          <folding>
+            <element signature="e#1235#1236#0" expanded="true" />
+            <element signature="e#1273#1274#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -800,29 +772,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/data/Register.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.22033899">
-          <caret line="13" column="38" selection-start-line="13" selection-start-column="38" selection-end-line="13" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/resource/simulation.txt">
       <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-636.0345">
-          <caret line="1085" column="32" selection-start-line="1085" selection-start-column="32" selection-end-line="1085" selection-end-column="32" />
+        <state vertical-scroll-proportion="-0.0">
+          <caret line="0" column="20" selection-start-line="0" selection-start-column="20" selection-end-line="0" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/simulator/Simulator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.06967213">
-          <caret line="235" column="32" selection-start-line="235" selection-start-column="32" selection-end-line="235" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.7756184">
+          <caret line="306" column="9" selection-start-line="306" selection-start-column="9" selection-end-line="306" selection-end-column="9" />
           <folding>
             <element signature="method#saveToMemory#0;class#Simulator#0" expanded="false" />
             <element signature="method#getMemoryData#0;class#Simulator#0" expanded="false" />
