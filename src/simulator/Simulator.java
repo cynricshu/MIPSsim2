@@ -233,19 +233,22 @@ public class Simulator {
             branch_inst = true;
 
             if ("J".equals(instr.getName())) {
+                stalled = false;
                 PC = instr.getImmediate();
                 waitInstr = null;
                 execInstr = instr;
             } else {
                 branchHazard = checkRAW(instr.getFj(), instr.getFk(), previousContext.preIssue.size());
 
-                // check RAW
-                for (Instruction previousInstr : currentContext.preIssue) {
-                    if (previousInstr.getFi() != null) {
-                        if ((instr.getFj() != null && previousInstr.getFi().intValue() == instr.getFj())
-                                || (instr.getFk() != null && previousInstr.getFi().intValue() == instr.getFk())) {
-                            branchHazard = true;
-                            break;
+                if (order == 2) {
+                    // check RAW
+                    for (Instruction previousInstr : currentContext.preIssue) {
+                        if (previousInstr.getFi() != null) {
+                            if ((instr.getFj() != null && previousInstr.getFi().intValue() == instr.getFj())
+                                    || (instr.getFk() != null && previousInstr.getFi().intValue() == instr.getFk())) {
+                                branchHazard = true;
+                                break;
+                            }
                         }
                     }
                 }
