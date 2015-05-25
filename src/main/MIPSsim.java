@@ -2,6 +2,8 @@ package main;
 
 import data.Instruction;
 import disassemb.Disassembler;
+import simulator.PipelineSimulator;
+import simulator.SimpleSimulator;
 import simulator.Simulator;
 
 import java.io.BufferedReader;
@@ -21,7 +23,19 @@ public class MIPSsim {
     public static void main(String[] args) {
 
         Disassembler disassembler = new Disassembler();
-        Simulator simulator = new Simulator();
+        Simulator simulator;
+
+        if (args.length > 1) {
+            if ("1".equals(args[1])) {
+                simulator = new SimpleSimulator();
+            } else {
+                simulator = new PipelineSimulator();
+            }
+        } else {
+            simulator = new PipelineSimulator();
+        }
+
+
         final String _inputFilePath = args[0];
 
         File file = new File(_inputFilePath);
