@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * User: Cynric
- * Date: 15/5/24
+ * Date: 15/5/18
  * Time: 13:56
  */
 
@@ -195,16 +195,13 @@ public class Simulator {
         execInstr = null;
         isBranchInstr = false;
 
-        //Fetch the 1st instruction
         if (emptySlotSize >= 1) {
             isBranchInstr = procFetch(1);
         }
 
-        //Fetch the 2nd instruction
         if (emptySlotSize >= 2 && !isBranchInstr) {
             procFetch(2);
         }
-
     }
 
     private boolean procFetch(int order) {
@@ -414,7 +411,7 @@ public class Simulator {
             hasRAW = checkRAW(instr.getFj(), instr.getFk(), lastIndex);
 
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW) {
-                previousContext.preIssue.remove(instr);
+//                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
                 currentContext.preALU.addLast(instr);
                 issued = true;
@@ -428,7 +425,7 @@ public class Simulator {
 
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2
                     && !hasRAW && !hasWAW && !hasWAR && !hasSW) {
-                previousContext.preIssue.remove(instr);
+//                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
                 currentContext.preALU.addLast(instr);
                 issued = true;
@@ -439,7 +436,7 @@ public class Simulator {
             hasWAR = checkWAR(instr.getFi(), lastIndex);
 
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW && !hasWAW && !hasWAR) {
-                previousContext.preIssue.remove(instr);
+//                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
                 currentContext.preALU.addLast(instr);
                 issued = true;
