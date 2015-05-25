@@ -39,10 +39,6 @@ public class Simulator {
     boolean isBreak = false;
     BufferedWriter writer;
 
-    public Simulator() {
-
-    }
-
     public void exec() {
         dataAddress = startAddress + instrList.size() * 4;
         cycle = 1;
@@ -79,21 +75,17 @@ public class Simulator {
     private void printCycle(BufferedWriter writer) {
         int ind;
 
-        String strWaitingIns = new String("");
+        String strWaitingIns = "";
         if (waitInstr != null) {
             strWaitingIns = "[" + waitInstr.getPrintValue() + "]";
         }
 
-        String strExecutedIns = new String("");
+        String strExecutedIns = "";
         if (execInstr != null) {
             strExecutedIns = "[" + execInstr.getPrintValue() + "]";
         }
 
         String strPreIssueBuf[] = new String[4];
-        strPreIssueBuf[0] = new String("");
-        strPreIssueBuf[1] = new String("");
-        strPreIssueBuf[2] = new String("");
-        strPreIssueBuf[3] = new String("");
         ind = 0;
         for (Instruction ins : previousContext.preIssue) {
             strPreIssueBuf[ind] = "[" + ins.getPrintValue() + "]";
@@ -101,27 +93,25 @@ public class Simulator {
         }
 
         String strPreALUBuf[] = new String[2];
-        strPreALUBuf[0] = new String("");
-        strPreALUBuf[1] = new String("");
         ind = 0;
         for (Instruction ins : previousContext.preALU) {
             strPreALUBuf[ind] = "[" + ins.getPrintValue() + "]";
             ind++;
         }
 
-        String strPostALUBuf = new String("");
+        String strPostALUBuf = "";
         if (previousContext.postALU.size() >= 1) {
             strPostALUBuf = "[" + previousContext.postALU.getFirst().getPrintValue() + "]";
         }
 
 
-        String strPreMEM = new String("");
+        String strPreMEM = "";
         if (previousContext.preMEM.size() >= 1) {
             strPreMEM = "[" + previousContext.preMEM.getFirst().getPrintValue() + "]";
         }
 
 
-        String strPostMEM = new String("");
+        String strPostMEM = "";
         if (previousContext.postMEM.size() >= 1) {
             strPostMEM = "[" + previousContext.postMEM.getFirst().getPrintValue() + "]";
         }
@@ -239,16 +229,13 @@ public class Simulator {
                 execInstr = instr;
             } else {
                 branchHazard = checkRAW(instr.getFj(), instr.getFk(), previousContext.preIssue.size());
-
-                if (order == 2) {
-                    // check RAW
-                    for (Instruction previousInstr : currentContext.preIssue) {
-                        if (previousInstr.getFi() != null) {
-                            if ((instr.getFj() != null && previousInstr.getFi().intValue() == instr.getFj())
-                                    || (instr.getFk() != null && previousInstr.getFi().intValue() == instr.getFk())) {
-                                branchHazard = true;
-                                break;
-                            }
+                // check RAW
+                for (Instruction previousInstr : currentContext.preIssue) {
+                    if (previousInstr.getFi() != null) {
+                        if ((instr.getFj() != null && previousInstr.getFi().intValue() == instr.getFj())
+                                || (instr.getFk() != null && previousInstr.getFi().intValue() == instr.getFk())) {
+                            branchHazard = true;
+                            break;
                         }
                     }
                 }
