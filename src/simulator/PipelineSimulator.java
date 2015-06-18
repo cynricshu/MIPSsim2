@@ -498,7 +498,7 @@ public class PipelineSimulator extends Simulator {
                 currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] & instr.getImmediate();
                 break;
             case "ORI":
-                currentRegState.registers[instr.getFi()] = ~(prevRegState.registers[instr.getFj()] | instr.getImmediate());
+                currentRegState.registers[instr.getFi()] = (prevRegState.registers[instr.getFj()] | instr.getImmediate());
                 break;
             case "XORI":
                 currentRegState.registers[instr.getFi()] = prevRegState.registers[instr.getFj()] ^ instr.getImmediate();
