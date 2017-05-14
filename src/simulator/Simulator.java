@@ -1,7 +1,7 @@
 package simulator;
 
-import data.Data;
-import data.Instruction;
+import model.Data;
+import model.Instruction;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,12 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: Cynric
- * Date: 15/5/18
- * Time: 13:56
+ * User: yichli
  */
-
-
 public abstract class Simulator {
     public static final int PRE_ISSUE_SIZE = 4;
     List<Instruction> instrList = new ArrayList<>();

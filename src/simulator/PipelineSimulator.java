@@ -1,7 +1,8 @@
 package simulator;
 
-import data.Instruction;
-import data.Register;
+import model.Instruction;
+import model.Register;
+import model.RuntimeVariables;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,17 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * User: Cynric
- * Date: 15/5/25
- * Time: 16:39
+ * User: yichli
  */
 public class PipelineSimulator extends Simulator {
     public static final int PRE_ISSUE_SIZE = 4;
     public Instruction execInstr;
     public Instruction waitInstr;
     public LinkedList<Instruction> inExecList = new LinkedList<>();
-    public PipelineContext previousContext = new PipelineContext();
-    public PipelineContext currentContext = new PipelineContext();
+    public RuntimeVariables previousContext = new RuntimeVariables();
+    public RuntimeVariables currentContext = new RuntimeVariables();
     public Register currentRegState = new Register();
     public Register prevRegState = new Register();
     boolean stalled = false;
@@ -42,7 +41,7 @@ public class PipelineSimulator extends Simulator {
             execute();
             memory();
             writeBack();
-            previousContext = new PipelineContext(currentContext);
+            previousContext = new RuntimeVariables(currentContext);
             printCycleResult(writer);
             cycle++;
         }
@@ -89,19 +88,19 @@ public class PipelineSimulator extends Simulator {
 
         String strPostALUBuf = "";
         if (previousContext.postALU.size() >= 1) {
-            strPostALUBuf = "[" + previousContext.postALU.getFirst().getPrintValue() + "]";
+            strPostALUBuf = "[" + previousContext.postALU.get(0).getPrintValue() + "]";
         }
 
 
         String strPreMEM = "";
         if (previousContext.preMEM.size() >= 1) {
-            strPreMEM = "[" + previousContext.preMEM.getFirst().getPrintValue() + "]";
+            strPreMEM = "[" + previousContext.preMEM.get(0).getPrintValue() + "]";
         }
 
 
         String strPostMEM = "";
         if (previousContext.postMEM.size() >= 1) {
-            strPostMEM = "[" + previousContext.postMEM.getFirst().getPrintValue() + "]";
+            strPostMEM = "[" + previousContext.postMEM.get(0).getPrintValue() + "]";
         }
 
         try {
@@ -215,7 +214,7 @@ public class PipelineSimulator extends Simulator {
             }
         } else {
             if (!stalled) {
-                currentContext.preIssue.addLast(instr);
+                currentContext.preIssue.add(instr);
                 PC += 4;
             }
         }
@@ -313,7 +312,8 @@ public class PipelineSimulator extends Simulator {
         Instruction instr;
 
         if (previousContext.postALU.size() >= 1) {
-            instr = currentContext.postALU.remove();
+            instr = currentContext.postALU.get(0);
+            currentContext.postALU.remove(0);
             if (instr.getFi() != null) {
                 prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()];
             }
@@ -324,7 +324,8 @@ public class PipelineSimulator extends Simulator {
         }
 
         if (previousContext.postMEM.size() >= 1) {
-            instr = currentContext.postMEM.remove();
+            instr = currentContext.postMEM.get(0);
+            currentContext.postMEM.remove(0);
             prevRegState.registers[instr.getFi()] = currentRegState.registers[instr.getFi()] = getMemoryData(instr.getAddress());
             inExecList.remove(instr);
         }
@@ -333,7 +334,7 @@ public class PipelineSimulator extends Simulator {
     private boolean checkAndIssue(Instruction instr, int order) {
         // if issue two instructions in one cycle, check if there is WAW of WAR hazards
         if (order == 2) {
-            Instruction lastInstr = currentContext.preALU.getFirst();
+            Instruction lastInstr = currentContext.preALU.get(0);
             Integer reg = instr.getFi();
             if (reg != null) {
                 // WAR
@@ -362,7 +363,7 @@ public class PipelineSimulator extends Simulator {
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW) {
 //                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
-                currentContext.preALU.addLast(instr);
+                currentContext.preALU.add(instr);
                 issued = true;
             }
         } else if ("LW".equals(name)) {
@@ -376,7 +377,7 @@ public class PipelineSimulator extends Simulator {
                     && !hasRAW && !hasWAW && !hasWAR && !hasSW) {
 //                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
-                currentContext.preALU.addLast(instr);
+                currentContext.preALU.add(instr);
                 issued = true;
             }
         } else if (!isBranchInstr(instr)) {
@@ -387,7 +388,7 @@ public class PipelineSimulator extends Simulator {
             if (previousContext.preALU.size() < 2 && currentContext.preALU.size() < 2 && !hasRAW && !hasWAW && !hasWAR) {
 //                previousContext.preIssue.remove(instr);
                 currentContext.preIssue.remove(instr);
-                currentContext.preALU.addLast(instr);
+                currentContext.preALU.add(instr);
                 issued = true;
             }
         }
@@ -419,7 +420,8 @@ public class PipelineSimulator extends Simulator {
         Instruction instr;
 
         if (previousContext.preALU.size() >= 1) {
-            instr = currentContext.preALU.remove();
+            instr = currentContext.preALU.get(0);
+            currentContext.preALU.remove(0);
             String name = instr.getName();
             if ("LW".equals(name) || "SW".equals(name)) { // calculate address only
                 int address;
@@ -427,19 +429,19 @@ public class PipelineSimulator extends Simulator {
                     case "LW":
                         address = prevRegState.registers[instr.getFj()] + instr.getImmediate();
                         instr.setAddress(address);
-                        currentContext.preMEM.addLast(instr);
+                        currentContext.preMEM.add(instr);
                         break;
                     case "SW":
                         address = prevRegState.registers[instr.getFk()] + instr.getImmediate();
                         instr.setAddress(address);
-                        currentContext.preMEM.addLast(instr);
+                        currentContext.preMEM.add(instr);
                         break;
                     default:
                         break;
                 }
             } else {
                 executeInstruction(instr);
-                currentContext.postALU.addLast(instr);
+                currentContext.postALU.add(instr);
             }
         }
 
@@ -448,14 +450,15 @@ public class PipelineSimulator extends Simulator {
     private void memory() {
         Instruction instr;
         if (previousContext.preMEM.size() > 0) {
-            instr = currentContext.preMEM.remove();
+            instr = currentContext.preMEM.get(0);
+            currentContext.preMEM.remove(0);
             String name = instr.getName();
             int address = instr.getAddress();
             switch (name) {
                 case "LW":
                     int readedData = getMemoryData(address);
                     instr.setReadedData(readedData);
-                    currentContext.postMEM.addLast(instr);
+                    currentContext.postMEM.add(instr);
                     break;
                 case "SW":
                     saveToMemory(prevRegState.registers[instr.getFj()], address);

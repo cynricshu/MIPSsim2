@@ -1,9 +1,7 @@
-package data;
+package model;
 
 /**
- * User: Cynric
- * Date: 15/5/20
- * Time: 10:08
+ * User: yichli
  */
 public class Instruction {
     private int[] args;

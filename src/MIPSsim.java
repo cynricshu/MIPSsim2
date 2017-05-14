@@ -1,6 +1,4 @@
-package main;
-
-import data.Instruction;
+import model.Instruction;
 import disassemb.Disassembler;
 import simulator.PipelineSimulator;
 import simulator.SimpleSimulator;
@@ -12,9 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- * User: Cynric
- * Date: 15/5/24
- * Time: 09:05
+ * User: yichli
  */
 public class MIPSsim {
     public static final String _disassembleFilePath = "./resource/disassembler.txt";

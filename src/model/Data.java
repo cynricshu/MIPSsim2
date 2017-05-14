@@ -1,9 +1,7 @@
-package data;
+package model;
 
 /**
- * User: Cynric
- * Date: 15/5/18
- * Time: 10:07
+ * User: yichli
  */
 public class Data {
     int value;

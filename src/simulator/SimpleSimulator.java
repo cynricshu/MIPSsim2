@@ -1,7 +1,7 @@
 package simulator;
 
-import data.Instruction;
-import data.Register;
+import model.Instruction;
+import model.Register;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,9 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * User: Cynric
- * Date: 15/5/25
- * Time: 16:46
+ * User: yichli
  */
 public class SimpleSimulator extends Simulator {
     Integer R[] = new Register().registers;

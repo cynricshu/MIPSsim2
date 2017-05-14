@@ -1,9 +1,7 @@
-package data;
+package model;
 
 /**
- * User: Cynric
- * Date: 15/5/24
- * Time: 16:07
+ * User: yichli
  */
 public class Register {
     public Integer registers[];

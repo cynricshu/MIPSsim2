@@ -1,7 +1,7 @@
 package disassemb;
 
-import data.Data;
-import data.Instruction;
+import model.Data;
+import model.Instruction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,9 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * User: Cynric
- * Date: 15/5/24
- * Time: 10:06
+ * User: yichli
  */
 public class Disassembler {
     private static final String category1Pattern = "000(?<opcode>\\d{3})\\d{26}";
